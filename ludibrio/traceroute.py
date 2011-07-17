@@ -4,6 +4,7 @@ import traceback
 from ludibrio._testdouble import _ProxyToAlias
 from helpers import frame_out_of_context
 
+
 class TraceRoute(_ProxyToAlias):
     def __init__(self):
         self.__traceback__= []
@@ -15,9 +16,11 @@ class TraceRoute(_ProxyToAlias):
             self.__traceback__.append(traceinfo)
 
     def _is_equal_to_last(self, trace):
-        return bool(not self.__traceback__
-                    or not self.__traceback__[-1].filename == trace.filename
-                    or not self.__traceback__[-1].lineno == trace.lineno)
+        # python2.5 trace is tuple
+        filename_lineno = lambda tb: (hasattr(tb, 'filename') and
+                (tb.filename, tb.lineno) or (tb[0], tb[1]))
+        return bool(not self.__traceback__ or
+                filename_lineno(self.__traceback__[-1]) != filename_lineno(trace))
 
     def _frame_of_trace(self):
         return frame_out_of_context()

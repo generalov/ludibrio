@@ -28,6 +28,8 @@ class DependencyInjection(object):
     def import_double(self, name, globals={}, locals={}, fromlist=[], level=-1):
         """import_double(name, globals={}, locals={}, fromlist=[], level=-1) -> module
         """
+        # python2.5 calls the `import sre_parse` during getframeinfo() execution
+        if name == 'sre_parse': return _oldimport(name, globals, locals, fromlist, level)
         if not fromlist:raise ImportError('Use: from ... import ...')
         module = _oldimport(name, globals, locals, fromlist, level)
         self.original = module.__dict__[fromlist[0]]
